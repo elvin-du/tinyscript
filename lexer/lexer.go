@@ -2,7 +2,7 @@ package lexer
 
 import (
 	"io"
-	"tinyscript/util"
+	"tinyscript/lexer/util"
 )
 
 const EndToken = "$"

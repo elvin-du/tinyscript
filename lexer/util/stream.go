@@ -10,12 +10,13 @@ type Stream struct {
 	scanner    *bufio.Scanner
 	queueCache *list.List
 	endToken   string
+	isEnd      bool
 }
 
 func NewStream(r io.Reader, et string) *Stream {
 	s := bufio.NewScanner(r)
 	s.Split(bufio.ScanRunes)
-	return &Stream{scanner: s, queueCache: list.New(), endToken: et}
+	return &Stream{scanner: s, queueCache: list.New(), endToken: et, isEnd: false}
 }
 
 func (s *Stream) Next() string {
@@ -28,6 +29,8 @@ func (s *Stream) Next() string {
 		return s.scanner.Text()
 	}
 
+	s.isEnd = true
+
 	return s.endToken
 }
 
@@ -38,6 +41,10 @@ func (s *Stream) HasNext() bool {
 
 	if s.scanner.Scan() {
 		s.queueCache.PushBack(s.scanner.Text())
+		return true
+	}
+
+	if !s.isEnd {
 		return true
 	}
 
