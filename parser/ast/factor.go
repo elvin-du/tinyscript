@@ -36,11 +36,13 @@ func FactorParse(stream *PeekTokenStream) ASTNode {
 	if lexer.VARIABLE == typ {
 		stream.Next()
 		v := MakeVariable()
+		v.SetLabel(token.Value)
 		v.SetLexeme(token)
 		return v
 	} else if token.IsScalar() {
 		stream.Next()
 		scalar := MakeScalar()
+		scalar.SetLabel(token.Value)
 		scalar.SetLexeme(token)
 		return scalar
 	}

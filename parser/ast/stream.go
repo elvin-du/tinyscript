@@ -32,6 +32,10 @@ func (pt *PeekTokenStream) HasNext() bool {
 
 func (pt *PeekTokenStream) Peek() *lexer.Token {
 	t := pt.Next()
+	if nil == t {
+		return nil
+	}
+
 	pt.current -= 1
 	return t
 }
@@ -41,13 +45,13 @@ func (pt *PeekTokenStream) PutBack(n int) {
 	if pt.current-n < 0 {
 		panic("putback parameter is invalid")
 	}
-	pt.current -= n + 1 //必须+1，因为初始化时current就指向第一个元素
+	pt.current -= n //必须+1，因为初始化时current就指向第一个元素
 }
 
 func (pt *PeekTokenStream) NextMatch(value string) *lexer.Token {
 	token := pt.Next()
 	if token.Value != value {
-		panic(fmt.Sprintf("syntax err: want value:%s,got %s", token.Value, value))
+		panic(fmt.Sprintf("syntax err: want value:%s,got %s", value, token.Value))
 	}
 	return token
 }

@@ -16,8 +16,8 @@ func CallExprParse(factor ASTNode, stream *PeekTokenStream) ASTNode {
 	expr := MakeCallExpr()
 	expr.AddChild(factor)
 	stream.NextMatch("(")
-	p := DefaultExpr.Parse(stream)
-	for ; p != nil; p = DefaultExpr.Parse(stream) {
+	p := ExprParse(stream)
+	for ; p != nil; p = ExprParse(stream) {
 		expr.AddChild(p)
 		if stream.Peek().Value != ")" {
 			stream.NextMatch(",")

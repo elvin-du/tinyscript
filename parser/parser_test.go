@@ -37,7 +37,7 @@ func TestParser_Parse(t *testing.T) {
 func createExpr(src string) ast.ASTNode {
 	tokens := lexer.NewLexer(bytes.NewBufferString(src), lexer.EndToken).Analyse()
 	stream := ast.NewPeekTokenStream(tokens)
-	return ast.DefaultExpr.Parse(stream)
+	return ast.ExprParse(stream)
 }
 
 func TestSimple(t *testing.T) {

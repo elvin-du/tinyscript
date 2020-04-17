@@ -15,7 +15,7 @@ func TestNewPeekTokenStream(t *testing.T) {
 	assertToken(t, peekts.Next(), "+", lexer2.OPERATOR)
 	assertToken(t, peekts.Peek(), "b", lexer2.VARIABLE)
 	assertToken(t, peekts.Next(), "b", lexer2.VARIABLE)
-	peekts.PutBack(2)
+	peekts.PutBack(3)
 	assertToken(t, peekts.Peek(), "a", lexer2.VARIABLE)
 	assertToken(t, peekts.Next(), "a", lexer2.VARIABLE)
 }

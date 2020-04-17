@@ -164,6 +164,6 @@ func (e *Expr) combine(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode 
 
 	return expr
 }
-func (e *Expr) Parse(stream *PeekTokenStream) ASTNode {
-	return e.E(stream, 0)
+func ExprParse(stream *PeekTokenStream) ASTNode {
+	return DefaultExpr.E(stream, 0)
 }

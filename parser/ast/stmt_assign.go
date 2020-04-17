@@ -6,12 +6,26 @@ type AssignStmt struct {
 	*Stmt
 }
 
-//func NewVariable(parent ASTNode, stream *PeekTokenStream) *Variable {
-//	return &Variable{NewFactor(parent, stream)}
-//}
 func MakeAssignStmt() *AssignStmt {
 	v := &AssignStmt{MakeStmt()}
 	v.SetType(ASTNODE_TYPE_ASSIGN_STMT)
 	v.SetLabel("assign_stmt")
 	return v
+}
+
+func AssignStmtParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
+	stmt := MakeAssignStmt()
+	stmt.SetParent(parent)
+	tkn := stream.Peek()
+	factor := FactorParse(stream)
+	if nil == factor {
+		panic("syntax error:" + tkn.String())
+	}
+	stmt.AddChild(factor)
+	lexeme := stream.NextMatch("=")
+	stmt.SetLexeme(lexeme)
+	expr := ExprParse(stream)
+	stmt.AddChild(expr)
+
+	return stmt
 }

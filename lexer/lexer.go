@@ -256,7 +256,7 @@ func (l *Lexer) MakeOp() *Token {
 				return NewToken(OPERATOR, "==")
 			default:
 				l.PutBack(lookahead)
-				return NewToken(OPERATOR, "-")
+				return NewToken(OPERATOR, "=")
 			}
 		case 8:
 			switch lookahead {
