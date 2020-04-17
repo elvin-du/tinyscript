@@ -11,7 +11,7 @@ import (
 func TestParser_Parse(t *testing.T) {
 	source := "1+2+3+4"
 	parser := NewParser(lexer.NewLexer(bytes.NewBufferString(source), lexer.EndToken).Analyse())
-	expr := parser.Parse()
+	expr := parser.SimpleParse()
 
 	assert.Equal(t, len(expr.Children()), 2)
 

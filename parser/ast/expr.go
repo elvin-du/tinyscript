@@ -103,6 +103,7 @@ func (e *Expr) F(stream *PeekTokenStream) ASTNode {
 
 	return factor
 }
+
 func (e *Expr) E_(stream *PeekTokenStream, k int) ASTNode {
 	token := stream.Peek()
 	value := token.Value
