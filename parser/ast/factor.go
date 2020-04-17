@@ -2,7 +2,6 @@ package ast
 
 import (
 	"tinyscript/lexer"
-	"tinyscript/parser/util"
 )
 
 var _ ASTNode = &Factor{}
@@ -11,8 +10,12 @@ type Factor struct {
 	*node
 }
 
-func NewFactor(parent ASTNode, stream *util.PeekTokenStream) *Factor {
-	factor := &Factor{NewNode()}
+func MakeFactor() *Factor {
+	return &Factor{MakeNode()}
+}
+
+func NewFactor(parent ASTNode, stream *PeekTokenStream) *Factor {
+	factor := &Factor{MakeNode()}
 	token := stream.Next()
 	factor.SetLexeme(token)
 	factor.SetLabel(token.Value)
@@ -25,4 +28,21 @@ func NewFactor(parent ASTNode, stream *util.PeekTokenStream) *Factor {
 	}
 
 	return factor
+}
+
+func FactorParse(stream *PeekTokenStream) ASTNode {
+	token := stream.Peek()
+	typ := token.Typ
+	if lexer.VARIABLE == typ {
+		stream.Next()
+		v := MakeVariable()
+		v.SetLexeme(token)
+		return v
+	} else if token.IsScalar() {
+		stream.Next()
+		scalar := MakeScalar()
+		scalar.SetLexeme(token)
+		return scalar
+	}
+	return nil
 }

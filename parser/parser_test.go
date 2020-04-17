@@ -5,6 +5,7 @@ import (
 	"github.com/magiconair/properties/assert"
 	"testing"
 	lexer "tinyscript/lexer"
+	"tinyscript/parser/ast"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -31,4 +32,32 @@ func TestParser_Parse(t *testing.T) {
 	v4 := e3.GetChild(1)
 	assert.Equal(t, v4.Lexeme().Value, "4")
 	expr.Print(0)
+}
+
+func createExpr(src string) ast.ASTNode {
+	tokens := lexer.NewLexer(bytes.NewBufferString(src), lexer.EndToken).Analyse()
+	stream := ast.NewPeekTokenStream(tokens)
+	return ast.DefaultExpr.Parse(stream)
+}
+
+func TestSimple(t *testing.T) {
+	expr := createExpr("1+1+1")
+	assert.Equal(t, ast.ToPostfixExpr(expr), "1 1 1 + +")
+}
+
+func TestSimple1(t *testing.T) {
+	expr := createExpr(`"123" == ""`)
+	assert.Equal(t, ast.ToPostfixExpr(expr), `"123" "" ==`)
+}
+
+func TestComplex(t *testing.T) {
+	expr1 := createExpr("1+2*3")
+	expr2 := createExpr("1*2+3")
+	e3 := createExpr("10 * (7+4)")
+	e4 := createExpr("(1*2!=7)==3!=4*5+6")
+
+	assert.Equal(t, ast.ToPostfixExpr(expr1), "1 2 3 * +")
+	assert.Equal(t, ast.ToPostfixExpr(expr2), "1 2 * 3 +")
+	assert.Equal(t, ast.ToPostfixExpr(e3), "10 7 4 + *")
+	assert.Equal(t, ast.ToPostfixExpr(e4), "1 2 * 7 != 3 4 5 * 6 + != ==")
 }

@@ -35,7 +35,7 @@ type node struct {
 //test
 var _ ASTNode = &node{}
 
-func NewNode() *node {
+func MakeNode() *node {
 	return &node{children: make([]ASTNode, 0)}
 }
 func (n *node) Lexeme() *lexer.Token {

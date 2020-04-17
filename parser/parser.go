@@ -3,21 +3,20 @@ package parser
 import (
 	"tinyscript/lexer"
 	"tinyscript/parser/ast"
-	"tinyscript/parser/util"
 )
 
 type Parser struct {
-	stream *util.PeekTokenStream
+	stream *ast.PeekTokenStream
 }
 
 func NewParser(tokens []*lexer.Token) *Parser {
-	return &Parser{stream: util.NewPeekTokenStream(tokens)}
+	return &Parser{stream: ast.NewPeekTokenStream(tokens)}
 }
 
 //Expr -> digit + Expr | d|igit
 //digit -> 0|1|2|....|9
 func (p *Parser) Parse() ast.ASTNode {
-	expr := ast.NewExpr()
+	expr := ast.MakeExpr()
 	scalar := ast.NewScalar(expr, p.stream)
 
 	if !p.stream.HasNext() {
