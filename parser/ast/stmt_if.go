@@ -1,6 +1,6 @@
 package ast
 
-var DefaultIfStmt ASTNode = MakeIfStmt()
+var _ ASTNode = MakeIfStmt()
 
 type IfStmt struct {
 	*Stmt
@@ -9,30 +9,30 @@ type IfStmt struct {
 func MakeIfStmt() *IfStmt {
 	v := &IfStmt{MakeStmt()}
 	v.SetType(ASTNODE_TYPE_IF_STMT)
-	v.SetLabel("if_stmt")
+	v.SetLabel("if")
 	return v
 }
 
-func IfStmtParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
-	return IfParse(parent, stream)
+func IfStmtParse(stream *PeekTokenStream) ASTNode {
+	return IfParse(stream)
 }
 
 //IfStmt -> If(Expr) Block Tail
-func IfParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
+func IfParse(stream *PeekTokenStream) ASTNode {
 	lexeme := stream.NextMatch("if")
 	stream.NextMatch("(")
 	ifStmt := MakeIfStmt()
-	ifStmt.SetParent(parent)
+	//ifStmt.SetParent(parent)
 	ifStmt.SetLexeme(lexeme)
 
 	e := ExprParse(stream)
 	ifStmt.AddChild(e)
 	stream.NextMatch(")")
 
-	block := BlockParse(parent, stream)
+	block := BlockParse(stream)
 	ifStmt.AddChild(block)
 
-	tail := TailParse(parent, stream)
+	tail := TailParse(stream)
 	if tail != nil {
 		ifStmt.AddChild(tail)
 	}
@@ -41,7 +41,7 @@ func IfParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
 }
 
 //Tail -> else {Block} | else IfStmt | ⍷
-func TailParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
+func TailParse(stream *PeekTokenStream) ASTNode {
 	if !stream.HasNext() || stream.Peek().Value != "else" {
 		return nil
 	}
@@ -49,9 +49,9 @@ func TailParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
 	lookahead := stream.Peek()
 
 	if lookahead.Value == "{" {
-		return BlockParse(parent, stream)
+		return BlockParse(stream)
 	} else if lookahead.Value == "if" {
-		return IfParse(parent, stream)
+		return IfParse(stream)
 	}
 
 	return nil

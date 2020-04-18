@@ -17,7 +17,7 @@ func NewParser(tokens []*lexer.Token) *Parser {
 //digit -> 0|1|2|....|9
 func (p *Parser) SimpleParse() ast.ASTNode {
 	expr := ast.MakeExpr()
-	scalar := ast.NewScalar(expr, p.stream)
+	scalar := ast.NewScalar(p.stream)
 
 	if !p.stream.HasNext() {
 		return scalar

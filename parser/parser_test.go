@@ -31,7 +31,6 @@ func TestParser_Parse(t *testing.T) {
 
 	v4 := e3.GetChild(1)
 	assert.Equal(t, v4.Lexeme().Value, "4")
-	expr.Print(0)
 }
 
 func createExpr(src string) ast.ASTNode {

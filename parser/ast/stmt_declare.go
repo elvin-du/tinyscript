@@ -6,9 +6,8 @@ type DeclareStmt struct {
 	*Stmt
 }
 
-func NewDeclareStmt(parent ASTNode) *DeclareStmt {
+func NewDeclareStmt() *DeclareStmt {
 	d := MakeDeclareStmt()
-	d.SetParent(parent)
 
 	return d
 }
@@ -20,8 +19,8 @@ func MakeDeclareStmt() *DeclareStmt {
 	return v
 }
 
-func DeclareStmtParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
-	stmt := NewDeclareStmt(parent)
+func DeclareStmtParse(stream *PeekTokenStream) ASTNode {
+	stmt := NewDeclareStmt()
 	stream.NextMatch("var")
 	tkn := stream.Peek()
 	factor := FactorParse(stream)

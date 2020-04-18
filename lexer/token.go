@@ -67,3 +67,16 @@ func (t *Token) IsOperator() bool {
 func (t *Token) String() string {
 	return fmt.Sprintf("type:%v,value:%s", t.Typ, t.Value)
 }
+
+func (t *Token) IsValue() bool {
+	return t.IsVariable() || t.IsScalar()
+}
+
+func (t *Token) IsType() bool {
+	switch t.Value {
+	case "bool", "int", "float", "void", "string":
+		return true
+	}
+
+	return false
+}

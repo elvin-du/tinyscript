@@ -4,8 +4,6 @@ import (
 	"tinyscript/lexer"
 )
 
-var DefaultExpr = MakeExpr()
-
 type Expr struct {
 	*node
 }
@@ -15,10 +13,11 @@ func MakeExpr() *Expr {
 	return e
 }
 
-func NewExpr2(typ NodeType, token *lexer.Token) *Expr {
+func NewExpr(typ NodeType, token *lexer.Token) *Expr {
 	expr := MakeExpr()
 	expr.SetType(typ)
 	expr.SetLexeme(token)
+	expr.SetLabel(token.Value)
 	return expr
 }
 
@@ -83,7 +82,7 @@ func (e *Expr) U(stream *PeekTokenStream) ASTNode {
 	} else if value == "++" || value == "--" || value == "!" {
 		t := stream.Peek()
 		stream.NextMatch(value)
-		unaryExpr := NewExpr2(ASTNODE_TYPE_UNARY_EXPR, t)
+		unaryExpr := NewExpr(ASTNODE_TYPE_UNARY_EXPR, t)
 		unaryExpr.AddChild(e.E(stream, 0))
 		return unaryExpr
 	}
@@ -108,7 +107,7 @@ func (e *Expr) E_(stream *PeekTokenStream, k int) ASTNode {
 	token := stream.Peek()
 	value := token.Value
 	if PriorityTable.IsContain(k, value) {
-		expr := NewExpr2(ASTNODE_TYPE_BINARY_EXPR, stream.NextMatch(value))
+		expr := NewExpr(ASTNODE_TYPE_BINARY_EXPR, stream.NextMatch(value))
 		expr.AddChild(
 			e.combine(
 				stream,
@@ -158,12 +157,12 @@ func (e *Expr) combine(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode 
 		return a
 	}
 
-	expr := NewExpr2(ASTNODE_TYPE_BINARY_EXPR, b.Lexeme())
+	expr := NewExpr(ASTNODE_TYPE_BINARY_EXPR, b.Lexeme())
 	expr.AddChild(a)
 	expr.AddChild(b.GetChild(0))
 
 	return expr
 }
 func ExprParse(stream *PeekTokenStream) ASTNode {
-	return DefaultExpr.E(stream, 0)
+	return MakeExpr().E(stream, 0)
 }

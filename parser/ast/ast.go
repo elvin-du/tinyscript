@@ -15,21 +15,24 @@ type ASTNode interface {
 	GetChild(uint) ASTNode
 	Parent() ASTNode
 	Print(indent int)
+	TypeLexeme() *lexer.Token
 
 	//set
 	AddChild(ASTNode)
 	SetLexeme(*lexer.Token)
+	SetTypeLexeme(*lexer.Token)
 	SetType(NodeType)
 	SetLabel(string)
 	SetParent(ASTNode)
 }
 
 type node struct {
-	parent   ASTNode
-	children []ASTNode
-	label    string
-	typ      NodeType
-	lexeme   *lexer.Token
+	parent     ASTNode
+	children   []ASTNode
+	label      string
+	typ        NodeType
+	lexeme     *lexer.Token
+	typeLexeme *lexer.Token
 }
 
 //test
@@ -40,6 +43,9 @@ func MakeNode() *node {
 }
 func (n *node) Lexeme() *lexer.Token {
 	return n.lexeme
+}
+func (n *node) TypeLexeme() *lexer.Token {
+	return n.typeLexeme
 }
 func (n *node) Type() NodeType {
 	return n.typ
@@ -57,10 +63,14 @@ func (n *node) Parent() ASTNode {
 	return n.parent
 }
 func (n *node) AddChild(node ASTNode) {
+	node.SetParent(n)
 	n.children = append(n.children, node)
 }
 func (n *node) SetLexeme(lexeme *lexer.Token) {
 	n.lexeme = lexeme
+}
+func (n *node) SetTypeLexeme(lexeme *lexer.Token) {
+	n.typeLexeme = lexeme
 }
 func (n *node) SetType(t NodeType) {
 	n.typ = t

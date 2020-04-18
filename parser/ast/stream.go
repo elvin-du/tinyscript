@@ -59,7 +59,7 @@ func (pt *PeekTokenStream) NextMatch(value string) *lexer.Token {
 func (pt *PeekTokenStream) NextMatchType(typ lexer.TokenType) *lexer.Token {
 	token := pt.Next()
 	if token.Typ != typ {
-		panic(fmt.Sprintf("syntax err: want type: %s,got %s", token.Value, typ))
+		panic(fmt.Sprintf("syntax err: want type: %s,got %s", typ, token.Value))
 	}
 	return token
 }

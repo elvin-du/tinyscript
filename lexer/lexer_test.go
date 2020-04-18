@@ -137,3 +137,8 @@ func assertToken(t *testing.T, token *Token, wantValue string, wantType TokenTyp
 	assert.Equal(t, token.Typ, wantType)
 	assert.Equal(t, token.Value, wantValue)
 }
+
+func TestFromFile(t *testing.T) {
+	tokens := FromFile("./../tests/function.ts")
+	assert.Equal(t, len(tokens), 16)
+}

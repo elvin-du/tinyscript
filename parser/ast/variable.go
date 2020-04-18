@@ -6,8 +6,8 @@ type Variable struct {
 	*Factor
 }
 
-func NewVariable(parent ASTNode, stream *PeekTokenStream) *Variable {
-	return &Variable{NewFactor(parent, stream)}
+func NewVariable(stream *PeekTokenStream) *Variable {
+	return &Variable{NewFactor(stream)}
 }
 
 func MakeVariable() *Variable {

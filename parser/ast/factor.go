@@ -14,12 +14,11 @@ func MakeFactor() *Factor {
 	return &Factor{MakeNode()}
 }
 
-func NewFactor(parent ASTNode, stream *PeekTokenStream) *Factor {
+func NewFactor(stream *PeekTokenStream) *Factor {
 	factor := &Factor{MakeNode()}
 	token := stream.Next()
 	factor.SetLexeme(token)
 	factor.SetLabel(token.Value)
-	factor.SetParent(parent)
 
 	if lexer.VARIABLE == token.Typ {
 		factor.SetType(ASTNODE_TYPE_VARIABLE)

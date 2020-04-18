@@ -13,9 +13,9 @@ func MakeAssignStmt() *AssignStmt {
 	return v
 }
 
-func AssignStmtParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
+func AssignStmtParse(stream *PeekTokenStream) ASTNode {
 	stmt := MakeAssignStmt()
-	stmt.SetParent(parent)
+	//stmt.SetParent(parent)
 	tkn := stream.Peek()
 	factor := FactorParse(stream)
 	if nil == factor {

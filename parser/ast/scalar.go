@@ -6,8 +6,8 @@ type Scalar struct {
 	*Factor
 }
 
-func NewScalar(parent ASTNode, stream *PeekTokenStream) *Scalar {
-	return &Scalar{NewFactor(parent, stream)}
+func NewScalar(stream *PeekTokenStream) *Scalar {
+	return &Scalar{NewFactor(stream)}
 }
 
 func MakeScalar() *Scalar {

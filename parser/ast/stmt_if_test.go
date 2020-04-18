@@ -11,7 +11,7 @@ func TestIfStmtParse(t *testing.T) {
 	stream := createTokenStream(`if(a){
 a = 1
 }`)
-	stmt := IfStmtParse(nil, stream)
+	stmt := IfStmtParse(stream)
 	e := stmt.GetChild(0)
 	block := stmt.GetChild(1)
 	assignStmt := block.GetChild(0)
@@ -34,7 +34,7 @@ a = 2
 a = a * 3
 }`)
 
-	stmt := IfStmtParse(nil, stream)
+	stmt := IfStmtParse(stream)
 	expr := stmt.GetChild(0)
 	block := stmt.GetChild(1)
 	assignStmt := block.GetChild(0)

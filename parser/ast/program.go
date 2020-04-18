@@ -12,12 +12,12 @@ func MakeProgram() *Program {
 	return b
 }
 
-func ProgramParse(parent ASTNode, stream *PeekTokenStream) ASTNode {
+func ProgramParse(stream *PeekTokenStream) ASTNode {
 	p := MakeProgram()
-	p.SetParent(parent)
-	for stmt := StmtParse(parent, stream); nil != stmt; {
+	//p.SetParent(parent)
+	for stmt := StmtParse(stream); nil != stmt; {
 		p.AddChild(stmt)
-		stmt = StmtParse(parent, stream)
+		stmt = StmtParse(stream)
 	}
 
 	return p

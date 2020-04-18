@@ -2,6 +2,8 @@ package lexer
 
 import (
 	"io"
+	"os"
+	"path/filepath"
 	"tinyscript/lexer/util"
 )
 
@@ -10,6 +12,20 @@ const EndToken = "$"
 type Lexer struct {
 	*util.Stream
 	endToken string
+}
+
+func FromFile(path string) []*Token {
+	absPath, err := filepath.Abs(path)
+	if nil != err {
+		panic(err)
+	}
+	f, err := os.Open(absPath)
+	if nil != err {
+		panic(err)
+	}
+	defer f.Close()
+
+	return NewLexer(f, EndToken).Analyse()
 }
 
 func NewLexer(r io.Reader, et string) *Lexer {
@@ -85,7 +101,7 @@ func (l *Lexer) Analyse() []*Token {
 				lastToken = tokens[len(tokens)-1]
 			}
 
-			if nil == lastToken || !lastToken.IsNumber() || lastToken.IsOperator() {
+			if nil == lastToken || !lastToken.IsValue() || lastToken.IsOperator() {
 				l.PutBack(c)
 				tokens = append(tokens, l.MakeNumber())
 				continue
