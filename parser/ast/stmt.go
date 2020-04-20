@@ -12,6 +12,10 @@ func MakeStmt() *Stmt {
 }
 
 func StmtParse(stream *PeekTokenStream) ASTNode {
+	if !stream.HasNext(){
+		return nil
+	}
+
 	token := stream.Next()
 	lookahead := stream.Peek()
 	stream.PutBack(1)

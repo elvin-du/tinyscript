@@ -21,7 +21,7 @@ func NewTAInstruction(typ TAInstructionType, result *symbol.Symbol, op string, a
 func (t *TAInstruction) String() string {
 	switch t.Typ {
 	case TAINSTR_TYPE_ASSIGN:
-		if nil != t.Arg1 {
+		if nil != t.Arg2 {
 			return fmt.Sprintf("%s = %s %s %s", t.Result, t.Arg1, t.Op, t.Arg2)
 		} else {
 			return fmt.Sprintf("%s = %s", t.Result, t.Arg1)
