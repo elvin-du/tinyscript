@@ -1,6 +1,9 @@
 package symbol
 
-import "tinyscript/lexer"
+import (
+	"fmt"
+	"tinyscript/lexer"
+)
 
 type Table struct {
 	Parent      *Table
@@ -33,8 +36,8 @@ func (t *Table) symbolByLexeme(lexeme *lexer.Token) *Symbol {
 }
 
 func (t *Table) Exists(lexeme *lexer.Token) bool {
-	symbl := t.symbolByLexeme(lexeme)
-	if nil != symbl {
+	symbol := t.symbolByLexeme(lexeme)
+	if nil != symbol {
 		return true
 	}
 
@@ -66,12 +69,35 @@ func (t *Table) CreateSymbolByLexeme(lexeme *lexer.Token) *Symbol {
 	} else {
 		symbol = t.CloneFromSymbolTree(lexeme, 0)
 		if symbol == nil {
-			symbol = MakeAddressSymbol(lexeme, t.OffsetIndex+1)
+			t.OffsetIndex +=1
+			symbol = MakeAddressSymbol(lexeme, t.OffsetIndex)
 		}
 	}
-
-	t.Symbols = append(t.Symbols, symbol)
+	t.AddSymbol(symbol)
 
 	return symbol
 }
 
+func (t *Table) CreateVariable() *Symbol {
+	t.TempIndex += 1
+	lexeme := lexer.NewToken(lexer.VARIABLE, "p"+fmt.Sprintf("%d", t.TempIndex))
+	t.OffsetIndex += 1
+	symbol := MakeAddressSymbol(lexeme, t.OffsetIndex)
+	t.AddSymbol(symbol)
+	return symbol
+}
+
+func (t *Table) AddChild(child *Table) {
+	child.Parent = t
+	child.Level = t.Level + 1
+	t.Children = append(t.Children, child)
+}
+
+func (t *Table) LocalSize() int {
+	return t.OffsetIndex
+}
+
+func (t *Table) CreateLabel(label string, lexeme *lexer.Token) {
+	labelSymbol := MakeLabelSymbol(label, lexeme)
+	t.AddSymbol(labelSymbol)
+}
