@@ -16,6 +16,8 @@ type ASTNode interface {
 	Parent() ASTNode
 	Print(indent int)
 	TypeLexeme() *lexer.Token
+	IsValueType() bool
+	Prop(string) interface{}
 
 	//set
 	AddChild(ASTNode)
@@ -24,6 +26,7 @@ type ASTNode interface {
 	SetType(NodeType)
 	SetLabel(string)
 	SetParent(ASTNode)
+	SetProp(string, interface{})
 }
 
 type node struct {
@@ -33,19 +36,29 @@ type node struct {
 	typ        NodeType
 	lexeme     *lexer.Token
 	typeLexeme *lexer.Token
+	prop       map[string]interface{}
 }
 
 //test
 var _ ASTNode = &node{}
 
 func MakeNode() *node {
-	return &node{children: make([]ASTNode, 0)}
+	return &node{children: make([]ASTNode, 0), prop: make(map[string]interface{})}
+}
+func (n *node) Prop(key string) interface{} {
+	return n.prop[key]
+}
+func (n *node) SetProp(key string, value interface{}) {
+	n.prop[key] = value
 }
 func (n *node) Lexeme() *lexer.Token {
 	return n.lexeme
 }
 func (n *node) TypeLexeme() *lexer.Token {
 	return n.typeLexeme
+}
+func (n *node) IsValueType() bool {
+	return n.typ == ASTNODE_TYPE_VARIABLE || n.typ == ASTNODE_TYPE_SCALAR
 }
 func (n *node) Type() NodeType {
 	return n.typ

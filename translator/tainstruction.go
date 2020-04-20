@@ -14,7 +14,7 @@ type TAInstruction struct {
 	Label  string
 }
 
-func NewTAInstruction(arg1 interface{}, arg2 interface{}, op string, result *symbol.Symbol, typ TAInstructionType) *TAInstruction {
+func NewTAInstruction(typ TAInstructionType, result *symbol.Symbol, op string, arg1 interface{}, arg2 interface{}) *TAInstruction {
 	return &TAInstruction{Arg1: arg1, Arg2: arg2, Op: op, Result: result, Typ: typ}
 }
 

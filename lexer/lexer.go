@@ -1,6 +1,7 @@
 package lexer
 
 import (
+	"bytes"
 	"io"
 	"os"
 	"path/filepath"
@@ -26,6 +27,10 @@ func FromFile(path string) []*Token {
 	defer f.Close()
 
 	return NewLexer(f, EndToken).Analyse()
+}
+
+func Analyse(source string) []*Token {
+	return NewLexer(bytes.NewBufferString(source), EndToken).Analyse()
 }
 
 func NewLexer(r io.Reader, et string) *Lexer {

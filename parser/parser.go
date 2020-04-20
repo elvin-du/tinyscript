@@ -9,8 +9,21 @@ type Parser struct {
 	stream *ast.PeekTokenStream
 }
 
+func Parse(source string) ast.ASTNode {
+	return NewParser(lexer.Analyse(source)).parse()
+}
+
+func ParseFromFile(file string) ast.ASTNode {
+	tokens := lexer.FromFile(file)
+	return NewParser(tokens).parse()
+}
+
 func NewParser(tokens []*lexer.Token) *Parser {
 	return &Parser{stream: ast.NewPeekTokenStream(tokens)}
+}
+
+func (p *Parser) parse() ast.ASTNode {
+	return ast.ProgramParse(p.stream)
 }
 
 //Expr -> digit + Expr | d|igit

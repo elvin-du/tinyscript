@@ -25,7 +25,7 @@ func TestTableChain(t *testing.T) {
 	childTable.AddChild(childChildTable)
 
 	assert.Equal(t, childChildTable.Exists(lexer.NewToken(lexer.VARIABLE, "a")), true)
-	assert.Equal(t, childTable.Exists(lexer.NewToken(lexer.VARIABLE, " a")), true)
+	assert.Equal(t, childTable.Exists(lexer.NewToken(lexer.VARIABLE, "a")), true)
 }
 
 func TestOffset(t *testing.T) {

@@ -14,7 +14,6 @@ func MakeProgram() *Program {
 
 func ProgramParse(stream *PeekTokenStream) ASTNode {
 	p := MakeProgram()
-	//p.SetParent(parent)
 	for stmt := StmtParse(stream); nil != stmt; {
 		p.AddChild(stmt)
 		stmt = StmtParse(stream)

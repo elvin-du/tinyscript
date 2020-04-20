@@ -56,7 +56,7 @@ func (t *Table) CloneFromSymbolTree(lexeme *lexer.Token, layoutOffset int) *Symb
 		return &symbol
 	}
 	if nil != t.Parent {
-		return t.CloneFromSymbolTree(lexeme, layoutOffset+1)
+		return t.Parent.CloneFromSymbolTree(lexeme, layoutOffset+1)
 	}
 
 	return nil
@@ -66,23 +66,29 @@ func (t *Table) CreateSymbolByLexeme(lexeme *lexer.Token) *Symbol {
 	var symbol *Symbol = nil
 	if lexeme.IsScalar() {
 		symbol = MakeImmediateSymbol(lexeme)
+		t.AddSymbol(symbol)
 	} else {
-		symbol = t.CloneFromSymbolTree(lexeme, 0)
-		if symbol == nil {
-			t.OffsetIndex +=1
-			symbol = MakeAddressSymbol(lexeme, t.OffsetIndex)
+		symbol2 := t.symbolByLexeme(lexeme)
+		if nil == symbol2 {
+			symbol = t.CloneFromSymbolTree(lexeme, 0)
+			if symbol == nil {
+				symbol = MakeAddressSymbol(lexeme, t.OffsetIndex)
+				t.OffsetIndex += 1
+			}
+			t.AddSymbol(symbol)
+		} else {
+			symbol = symbol2
 		}
 	}
-	t.AddSymbol(symbol)
 
 	return symbol
 }
 
 func (t *Table) CreateVariable() *Symbol {
-	t.TempIndex += 1
 	lexeme := lexer.NewToken(lexer.VARIABLE, "p"+fmt.Sprintf("%d", t.TempIndex))
-	t.OffsetIndex += 1
+	t.TempIndex += 1
 	symbol := MakeAddressSymbol(lexeme, t.OffsetIndex)
+	t.OffsetIndex += 1
 	t.AddSymbol(symbol)
 	return symbol
 }

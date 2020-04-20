@@ -11,6 +11,10 @@ type TAProgram struct {
 	StaticTable  *symbol.StaticSymbolTable
 }
 
+func NewTAProgram() *TAProgram {
+	return &TAProgram{Instructions: make([]*TAInstruction, 0), StaticTable: symbol.NewStaticSymbolTable()}
+}
+
 func (t *TAProgram) Add(instr *TAInstruction) {
 	t.Instructions = append(t.Instructions, instr)
 }

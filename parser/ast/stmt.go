@@ -26,7 +26,9 @@ func StmtParse(stream *PeekTokenStream) ASTNode {
 		return ReturnStmtParse(stream)
 	} else if token.Value == "if" {
 		return IfStmtParse(stream)
+	} else if token.Value == "{" {
+		return BlockParse(stream)
+	} else {
+		return ExprParse(stream)
 	}
-
-	return nil
 }

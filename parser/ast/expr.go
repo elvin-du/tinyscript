@@ -31,66 +31,66 @@ type ExprHOF func() ASTNode
 // 		E(t) -> F E_(k) | U E_(k)
 //		E_(t) -> op(t) E(t) E_(t) | ⍷
 
-func (e *Expr) E(stream *PeekTokenStream, k int) ASTNode {
+func E(stream *PeekTokenStream, k int) ASTNode {
 	if k < PriorityTable.Size()-1 {
-		return e.combine(
+		return combine(
 			stream,
 			func() ASTNode {
-				return e.E(stream, k+1)
+				return E(stream, k+1)
 			},
 			func() ASTNode {
-				return e.E_(stream, k)
+				return E_(stream, k)
 			},
 		)
 	}
 
-	return e.race(
+	return race(
 		stream,
 		func() ASTNode {
-			return e.combine(
+			return combine(
 				stream,
 				func() ASTNode {
-					return e.F(stream)
+					return F(stream)
 				},
 				func() ASTNode {
-					return e.E_(stream, k)
+					return E_(stream, k)
 				},
 			)
 		},
 		func() ASTNode {
-			return e.combine(
+			return combine(
 				stream,
 				func() ASTNode {
-					return e.U(stream)
+					return U(stream)
 				},
 				func() ASTNode {
-					return e.E_(stream, k)
+					return E_(stream, k)
 				},
 			)
 		},
 	)
 }
 
-func (e *Expr) U(stream *PeekTokenStream) ASTNode {
+func U(stream *PeekTokenStream) ASTNode {
 	token := stream.Peek()
 	value := token.Value
 	if value == "(" {
 		stream.NextMatch("(")
-		expr := e.E(stream, 0)
+		expr := E(stream, 0)
 		stream.NextMatch(")")
 		return expr
 	} else if value == "++" || value == "--" || value == "!" {
 		t := stream.Peek()
 		stream.NextMatch(value)
 		unaryExpr := NewExpr(ASTNODE_TYPE_UNARY_EXPR, t)
-		unaryExpr.AddChild(e.E(stream, 0))
+		unaryExpr.AddChild(E(stream, 0))
 		return unaryExpr
 	}
 
 	return nil
 }
 
-func (e *Expr) F(stream *PeekTokenStream) ASTNode {
+func F(stream *PeekTokenStream) ASTNode {
 	factor := FactorParse(stream)
 	if nil == factor {
 		return nil
@@ -103,19 +103,19 @@ func (e *Expr) F(stream *PeekTokenStream) ASTNode {
 	return factor
 }
 
-func (e *Expr) E_(stream *PeekTokenStream, k int) ASTNode {
+func E_(stream *PeekTokenStream, k int) ASTNode {
 	token := stream.Peek()
 	value := token.Value
 	if PriorityTable.IsContain(k, value) {
 		expr := NewExpr(ASTNODE_TYPE_BINARY_EXPR, stream.NextMatch(value))
 		expr.AddChild(
-			e.combine(
+			combine(
 				stream,
 				func() ASTNode {
-					return e.E(stream, k+1)
+					return E(stream, k+1)
 				},
 				func() ASTNode {
-					return e.E_(stream, k)
+					return E_(stream, k)
 				},
 			),
 		)
@@ -125,7 +125,7 @@ func (e *Expr) E_(stream *PeekTokenStream, k int) ASTNode {
 	return nil
 }
 
-func (e *Expr) race(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode {
+func race(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode {
 	if !stream.HasNext() {
 		return nil
 	}
@@ -138,7 +138,7 @@ func (e *Expr) race(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode {
 	return bf()
 }
 
-func (e *Expr) combine(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode {
+func combine(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode {
 	a := af()
 	if nil == a {
 		if stream.HasNext() {
@@ -163,6 +163,7 @@ func (e *Expr) combine(stream *PeekTokenStream, af ExprHOF, bf ExprHOF) ASTNode 
 
 	return expr
 }
+
 func ExprParse(stream *PeekTokenStream) ASTNode {
-	return MakeExpr().E(stream, 0)
+	return E(stream, 0)
 }
