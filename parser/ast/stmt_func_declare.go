@@ -8,7 +8,7 @@ type FuncDeclareStmt struct {
 
 func MakeFuncDeclareStmt() *FuncDeclareStmt {
 	v := &FuncDeclareStmt{MakeStmt()}
-	v.SetType(ASTNODE_TYPE_DECLARE_STMT)
+	v.SetType(ASTNODE_TYPE_FUNCTION_DECLARE_STMT)
 	v.SetLabel("func")
 	return v
 }

@@ -103,3 +103,37 @@ func TestTranslator_TranslateIfElseIfStmt(t *testing.T) {
 	program := translator.Translate(astNode)
 	t.Log(program)
 }
+
+func TestSimpleFunction(t *testing.T) {
+	node := parser.ParseFromFile("../tests/function.ts")
+	translator := NewTranslator()
+	program := translator.Translate(node)
+	expected := `L0:
+FUNC_BEGIN
+p1 = a + b
+RETURN p1`
+	assert.Equal(t, program.String(), expected)
+}
+
+func TestRecursionFunc(t *testing.T) {
+	node := parser.ParseFromFile("../tests/recursion.ts")
+	translator := NewTranslator()
+	program := translator.Translate(node)
+	expected := `L0:
+FUNC_BEGIN
+p1 = n == 0
+IF p1 ELSE L1
+SP -3
+RETURN 1
+SP 3
+L1:
+p4 = n - 1
+PARAM p4 0
+SP -6
+CALL L0
+SP 6
+p5 = p2 * n
+RETURN p5`
+	assert.Equal(t, program.String(), expected)
+
+}

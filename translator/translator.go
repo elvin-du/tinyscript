@@ -21,23 +21,33 @@ func (t *Translator) Translate(node ast.ASTNode) *TAProgram {
 	for _, child := range node.Children() {
 		t.TranslateStmt(program, child, table)
 	}
+	program.SetStaticSymbols(table)
 
 	return program
 }
 
 func (t *Translator) TranslateStmt(program *TAProgram, node ast.ASTNode, table *symbol.Table) {
 	switch node.Type() {
+	case ast.ASTNODE_TYPE_BLOCK:
+		t.TranslateBlock(program, node, table)
+		return
+	case ast.ASTNODE_TYPE_IF_STMT:
+		t.TranslateIfStmt(program, node.(*ast.IfStmt), table)
+		return
 	case ast.ASTNODE_TYPE_ASSIGN_STMT:
 		t.TranslateAssignStmt(program, node, table)
 		return
 	case ast.ASTNODE_TYPE_DECLARE_STMT:
 		t.TranslateDeclareStmt(program, node, table)
 		return
-	case ast.ASTNODE_TYPE_BLOCK:
-		t.TranslateBlock(program, node, table)
+	case ast.ASTNODE_TYPE_FUNCTION_DECLARE_STMT:
+		t.TranslateFunctionDeclareStmt(program, node, table)
 		return
-	case ast.ASTNODE_TYPE_IF_STMT:
-		t.TranslateIfStmt(program, node.(*ast.IfStmt), table)
+	case ast.ASTNODE_TYPE_RETURN_STMT:
+		t.TranslateReturnStmt(program, node, table)
+		return
+	case ast.ASTNODE_TYPE_CALL_EXPR:
+		t.TranslateCallExpr(program, node, table)
 		return
 	}
 
@@ -73,9 +83,11 @@ func (t *Translator) TranslateExpr(program *TAProgram, node ast.ASTNode, table *
 		node.SetProp("addr", addr)
 		return addr
 	} else if node.Type() == ast.ASTNODE_TYPE_CALL_EXPR {
-		panic("not now")
+		addr := t.TranslateCallExpr(program, node, table)
+		node.SetProp("addr", addr)
+		return addr
 	}
-
+	//else if IsInstanceOfExpr(node) {
 	for _, child := range node.Children() {
 		t.TranslateExpr(program, child, table)
 	}
@@ -94,6 +106,8 @@ func (t *Translator) TranslateExpr(program *TAProgram, node ast.ASTNode, table *
 
 	program.Add(instr)
 	return instr.Result
+	//}
+	panic("unexpected node type :" + node.Type().String())
 }
 
 func (t *Translator) TranslateBlock(program *TAProgram, node ast.ASTNode, parent *symbol.Table) {
@@ -143,4 +157,57 @@ func (t *Translator) TranslateIfStmt(program *TAProgram, node *ast.IfStmt, table
 	} else {
 		gotoInstr.Arg1 = labelEnd.Arg1
 	}
+}
+
+func (t *Translator) TranslateFunctionDeclareStmt(program *TAProgram, node ast.ASTNode, parent *symbol.Table) {
+	label := program.AddLabel()
+
+	table := symbol.NewTable()
+
+	program.Add(NewTAInstruction(TAINSTR_TYPE_FUNC_BEGIN, nil, "", nil, nil))
+	table.CreateVariable() //返回地址
+
+	label.Arg2 = node.Lexeme().Value
+
+	fn := node.(*ast.FuncDeclareStmt)
+	args := fn.Args()
+	parent.AddChild(table)
+	parent.CreateLabel(label.Arg1.(string), node.Lexeme())
+	for _, arg := range args.Children() {
+		table.CreateSymbolByLexeme(arg.Lexeme())
+	}
+
+	for _, child := range fn.Block().Children() {
+		t.TranslateStmt(program, child, table)
+	}
+}
+
+func (t *Translator) TranslateCallExpr(program *TAProgram, node ast.ASTNode, table *symbol.Table) *symbol.Symbol {
+	//foo()
+	factor := node.GetChild(0)
+
+	//foo -> symbol(foo) L0
+	returnValue := table.CreateVariable()
+	table.CreateVariable()
+
+	for i := 1; i < len(node.Children()); i++ {
+		expr := node.GetChild(uint(i))
+		addr := t.TranslateExpr(program, expr, table)
+		program.Add(NewTAInstruction(TAINSTR_TYPE_PARAM, nil, "", addr, i-1))
+	}
+
+	funcAddr := table.CloneFromSymbolTree(factor.Lexeme(), 0)
+	program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", -table.LocalSize(), nil))
+	program.Add(NewTAInstruction(TAINSTR_TYPE_CALL, nil, "", funcAddr, nil))
+	program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", table.LocalSize(), nil))
+
+	return returnValue
+}
+
+func (t *Translator) TranslateReturnStmt(program *TAProgram, node ast.ASTNode, table *symbol.Table) {
+	var resultValue *symbol.Symbol = nil
+	if node.GetChild(0) != nil {
+		resultValue = t.TranslateExpr(program, node.GetChild(0), table)
+	}
+	program.Add(NewTAInstruction(TAINSTR_TYPE_RETURN, nil, "", resultValue, nil))
 }
