@@ -1,5 +1,7 @@
 package operand
 
+import "fmt"
+
 var _ Operand = &Register{}
 
 var (
@@ -34,4 +36,12 @@ func (reg *Register) Typ() OperandType {
 }
 func (reg *Register) String() string {
 	return reg.Name
+}
+
+func RegisterFromAddr(reg int) *Register {
+	if reg < 0 || reg >= len(Registers) {
+		panic(fmt.Sprintf("no register's address is %d", reg))
+	}
+
+	return Registers[reg]
 }

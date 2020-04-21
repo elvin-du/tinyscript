@@ -130,3 +130,57 @@ func LoadToRegister(target *operand.Register, arg *symbol.Symbol) *Instruction {
 func SaveToMemory(source *operand.Register, arg *symbol.Symbol) *Instruction {
 	return NewOffsetInstruction(SW, source, operand.SP, operand.NewOffset(-arg.Offset))
 }
+
+func FromByCode(code int) *Instruction {
+	byteOpcode := (byte)(code&MASK_OPCODE) >> 26
+	opcode := FromByte(byteOpcode)
+	i := NewInstruction(opcode)
+
+	switch opcode.AddrType {
+	case ADDRESSING_TYPE_IMMEDIATE:
+		reg := (code & MASK_R0) >> 21
+		number := code & MASK_OFFSET1
+		i.OpList = append(i.OpList, operand.RegisterFromAddr(reg))
+		i.OpList = append(i.OpList, operand.NewImmediateNumber(number))
+	case ADDRESSING_TYPE_REGISTER:
+		r1Addr := (code & MASK_R0) >> 21
+		r2Addr := (code & MASK_R1) >> 16
+		r3Addr := (code & MASK_R2) >> 11
+		r1 := operand.RegisterFromAddr(r1Addr)
+
+		var r2 *operand.Register = nil
+		if r2Addr != 0 {
+			r2 = operand.RegisterFromAddr(r2Addr)
+		}
+
+		var r3 *operand.Register = nil
+		if r3Addr != 0 {
+			r3 = operand.RegisterFromAddr(r3Addr)
+		}
+
+		i.OpList = append(i.OpList, r1)
+
+		if nil != r2 {
+			i.OpList = append(i.OpList, r2)
+		}
+		if nil != r3 {
+			i.OpList = append(i.OpList, r3)
+		}
+	case ADDRESSING_TYPE_JUMP:
+		offset := code & MASK_OFFSET0
+		i.OpList = append(i.OpList, operand.DecodeOffset(offset))
+	case ADDRESSING_TYPE_OFFSET:
+		r1Addr := (code & MASK_R0) >> 21
+		r2Addr := (code & MASK_R1) >> 16
+		offset := code & MASK_OFFSET2
+		i.OpList = append(i.OpList, operand.RegisterFromAddr(r1Addr))
+		i.OpList = append(i.OpList, operand.RegisterFromAddr(r2Addr))
+		i.OpList = append(i.OpList, operand.DecodeOffset(offset))
+	}
+
+	return i
+}
+
+func (i *Instruction) GetOperand(index int) operand.Operand {
+	return i.OpList[index]
+}

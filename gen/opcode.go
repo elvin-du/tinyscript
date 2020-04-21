@@ -39,3 +39,7 @@ func NewOpCode(addrType AddressingType, name string, value byte) *OpCode {
 func (oc *OpCode) String() string {
 	return oc.Name
 }
+
+func FromByte(byteOpcode byte) *OpCode {
+	return Codes[byteOpcode]
+}
