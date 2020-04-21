@@ -1,6 +1,8 @@
 package translator
 
 import (
+	"fmt"
+	"tinyscript/lexer"
 	"tinyscript/parser/ast"
 	"tinyscript/translator/symbol"
 )
@@ -30,6 +32,12 @@ func (t *Translator) TranslateStmt(program *TAProgram, node ast.ASTNode, table *
 		return
 	case ast.ASTNODE_TYPE_DECLARE_STMT:
 		t.TranslateDeclareStmt(program, node, table)
+		return
+	case ast.ASTNODE_TYPE_BLOCK:
+		t.TranslateBlock(program, node, table)
+		return
+	case ast.ASTNODE_TYPE_IF_STMT:
+		t.TranslateIfStmt(program, node.(*ast.IfStmt), table)
 		return
 	}
 
@@ -86,4 +94,53 @@ func (t *Translator) TranslateExpr(program *TAProgram, node ast.ASTNode, table *
 
 	program.Add(instr)
 	return instr.Result
+}
+
+func (t *Translator) TranslateBlock(program *TAProgram, node ast.ASTNode, parent *symbol.Table) {
+	table := symbol.NewTable()
+	parent.AddChild(table)
+	parentOffset := table.CreateVariable()
+	parentOffset.Lexeme = lexer.NewToken(lexer.INTEGER, fmt.Sprintf("%d", parent.LocalSize()))
+
+	pushRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
+	program.Add(pushRecord)
+	for _, stmt := range node.Children() {
+		t.TranslateStmt(program, stmt, table)
+	}
+
+	popRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
+	program.Add(popRecord)
+
+	pushRecord.Arg1 = -parent.LocalSize()
+	popRecord.Arg1 = parent.LocalSize()
+}
+
+func (t *Translator) TranslateIfStmt(program *TAProgram, node *ast.IfStmt, table *symbol.Table) {
+	expr := node.GetExpr()
+	exprAddr := t.TranslateExpr(program, expr, table)
+	ifOpCode := NewTAInstruction(TAINSTR_TYPE_IF, nil, "", exprAddr, nil)
+	program.Add(ifOpCode)
+
+	t.TranslateBlock(program, node.GetBlock(), table)
+
+	var gotoInstr *TAInstruction = nil
+	if node.GetChild(2) != nil {
+		gotoInstr = NewTAInstruction(TAINSTR_TYPE_GOTO, nil, "", nil, nil)
+		program.Add(gotoInstr)
+		labelEndIf := program.AddLabel()
+		ifOpCode.Arg2 = labelEndIf.Arg1
+	}
+
+	if node.GetElseBlock() != nil {
+		t.TranslateBlock(program, node.GetElseBlock(), table)
+	} else if node.GetElseIfStmt() != nil {
+		t.TranslateIfStmt(program, node.GetElseIfStmt().(*ast.IfStmt), table)
+	}
+
+	labelEnd := program.AddLabel()
+	if node.GetChild(2) == nil {
+		ifOpCode.Arg2 = labelEnd.Arg1
+	} else {
+		gotoInstr.Arg1 = labelEnd.Arg1
+	}
 }

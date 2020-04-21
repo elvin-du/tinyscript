@@ -1,6 +1,7 @@
 package translator
 
 import (
+	"fmt"
 	"strings"
 	"tinyscript/translator/symbol"
 )
@@ -17,6 +18,15 @@ func NewTAProgram() *TAProgram {
 
 func (t *TAProgram) Add(instr *TAInstruction) {
 	t.Instructions = append(t.Instructions, instr)
+}
+
+func (t *TAProgram) AddLabel() *TAInstruction {
+	label := fmt.Sprintf("L%d", t.LabelCounter)
+	t.LabelCounter += 1
+	taCode := NewTAInstruction(TAINSTR_TYPE_LABEL, nil, "", nil, nil)
+	taCode.Arg1 = label
+	t.Instructions = append(t.Instructions, taCode)
+	return taCode
 }
 
 func (t *TAProgram) String() string {

@@ -56,3 +56,26 @@ func TailParse(stream *PeekTokenStream) ASTNode {
 
 	return nil
 }
+
+func (i *IfStmt) GetExpr() ASTNode {
+	return i.GetChild(0)
+}
+
+func (i *IfStmt) GetBlock() ASTNode {
+	return i.GetChild(1)
+}
+func (i *IfStmt) GetElseBlock() ASTNode {
+	block := i.GetChild(2)
+	if block != nil && block.Type() == ASTNODE_TYPE_BLOCK {
+		return block
+	}
+
+	return nil
+}
+func (i *IfStmt) GetElseIfStmt() ASTNode {
+	ifStmt := i.GetChild(2)
+	if ifStmt != nil && ifStmt.Type() == ASTNODE_TYPE_IF_STMT {
+		return ifStmt
+	}
+	return nil
+}

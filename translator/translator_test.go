@@ -45,3 +45,61 @@ func TestAssignStmt2(t *testing.T) {
 
 	assert.Equal(t, program.String(), "a = 1")
 }
+
+func TestBlock(t *testing.T) {
+
+	sourc := `var a = 1
+{
+var b = 1 * 100
+}
+{
+var b = a * 100
+}`
+
+	ast := parser.Parse(sourc)
+	translator := NewTranslator()
+	program := translator.Translate(ast)
+	t.Log(program)
+	//	expected := `a = 1
+	//SP -1
+	//p1 = 1 * 100
+	//b = p1
+	//SP 1
+	//SP -1
+	//p1 = a * 100
+	//b = p1
+	//SP 1
+	//`
+	//	assert.Equal(t, program, expected)
+}
+
+func TestTranslator_TranslateIfStmt(t *testing.T) {
+	source := `if(a){
+b=1
+}`
+
+	astNode := parser.Parse(source)
+	translator := NewTranslator()
+	program := translator.Translate(astNode)
+	t.Log(program)
+}
+
+func TestTranslator_TranslateIfElseStmt(t *testing.T) {
+	source := `if(a){
+b=1
+}else{
+b=2
+}`
+
+	astNode := parser.Parse(source)
+	translator := NewTranslator()
+	program := translator.Translate(astNode)
+	t.Log(program)
+}
+
+func TestTranslator_TranslateIfElseIfStmt(t *testing.T) {
+	astNode := parser.ParseFromFile("../tests/complex-if.ts")
+	translator := NewTranslator()
+	program := translator.Translate(astNode)
+	t.Log(program)
+}

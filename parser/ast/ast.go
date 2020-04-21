@@ -70,6 +70,9 @@ func (n *node) Children() []ASTNode {
 	return n.children
 }
 func (n *node) GetChild(index uint) ASTNode {
+	if int(index) >= len(n.children) {
+		return nil
+	}
 	return n.children[index]
 }
 func (n *node) Parent() ASTNode {
