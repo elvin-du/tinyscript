@@ -18,7 +18,7 @@ func NewTAInstruction(typ TAInstructionType, result *symbol.Symbol, op string, a
 	return &TAInstruction{Arg1: arg1, Arg2: arg2, Op: op, Result: result, Typ: typ}
 }
 
-func (t *TAInstruction) String() string {
+func (t TAInstruction) String() string {
 	switch t.Typ {
 	case TAINSTR_TYPE_ASSIGN:
 		if nil != t.Arg2 {

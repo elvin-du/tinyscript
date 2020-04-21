@@ -1,6 +1,10 @@
 package gen
 
-import "strings"
+import (
+	"strconv"
+	"strings"
+	"tinyscript/translator"
+)
 
 type OpCodeProgram struct {
 	Entry        *int
@@ -29,4 +33,33 @@ func (o *OpCodeProgram) String() string {
 	}
 
 	return strings.Join(prts, "\n")
+}
+
+func (o *OpCodeProgram) SetEntry(entry *int) {
+	o.Entry = entry
+}
+
+func (o *OpCodeProgram) AddComment(comment string) {
+	o.Comments[len(o.Comments)] = comment
+}
+
+func (o *OpCodeProgram) ToByteCode() []int {
+	codes := []int{}
+	for _, instr := range o.Instructions {
+		codes = append(codes, instr.ToByteCode())
+	}
+
+	return codes
+}
+
+func (o *OpCodeProgram) GetStaticArea(taProgram *translator.TAProgram) []int {
+	l := []int{}
+	for _, symbol := range taProgram.StaticTable.Symbols {
+		i, err := strconv.Atoi(symbol.Lexeme.Value)
+		if nil != err {
+			panic(err)
+		}
+		l = append(l, i)
+	}
+	return l
 }
