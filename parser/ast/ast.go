@@ -32,11 +32,11 @@ type ASTNode interface {
 type node struct {
 	parent     ASTNode
 	children   []ASTNode
-	label      string
+	label      string //
 	typ        NodeType
 	lexeme     *lexer.Token
-	typeLexeme *lexer.Token
-	prop       map[string]interface{}
+	typeLexeme *lexer.Token //func foo(int a); 这时typelexeme等于int型的token
+	prop       map[string]interface{} //用于符号表，语法分析不会用到
 }
 
 //test

@@ -22,7 +22,6 @@ func IfParse(stream *PeekTokenStream) ASTNode {
 	lexeme := stream.NextMatch("if")
 	stream.NextMatch("(")
 	ifStmt := MakeIfStmt()
-	//ifStmt.SetParent(parent)
 	ifStmt.SetLexeme(lexeme)
 
 	e := ExprParse(stream)

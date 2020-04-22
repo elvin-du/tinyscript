@@ -1,6 +1,6 @@
 package ast
 
-var DefaultProgram ASTNode = &Block{}
+var _ ASTNode = &Block{}
 
 type Program struct {
 	*Block
