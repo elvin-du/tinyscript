@@ -86,27 +86,27 @@ func (t *Translator) TranslateExpr(program *TAProgram, node ast.ASTNode, table *
 		addr := t.TranslateCallExpr(program, node, table)
 		node.SetProp("addr", addr)
 		return addr
-	}
-	//else if IsInstanceOfExpr(node) {
-	for _, child := range node.Children() {
-		t.TranslateExpr(program, child, table)
+	} else if IsInstanceOfExpr(node) {
+		for _, child := range node.Children() {
+			t.TranslateExpr(program, child, table)
+		}
+
+		if node.Prop("addr") == nil {
+			node.SetProp("addr", table.CreateVariable())
+		}
+
+		instr := NewTAInstruction(
+			TAINSTR_TYPE_ASSIGN,
+			node.Prop("addr").(*symbol.Symbol),
+			node.Lexeme().Value,
+			node.GetChild(0).Prop("addr").(*symbol.Symbol),
+			node.GetChild(1).Prop("addr").(*symbol.Symbol),
+		)
+
+		program.Add(instr)
+		return instr.Result
 	}
 
-	if node.Prop("addr") == nil {
-		node.SetProp("addr", table.CreateVariable())
-	}
-
-	instr := NewTAInstruction(
-		TAINSTR_TYPE_ASSIGN,
-		node.Prop("addr").(*symbol.Symbol),
-		node.Lexeme().Value,
-		node.GetChild(0).Prop("addr").(*symbol.Symbol),
-		node.GetChild(1).Prop("addr").(*symbol.Symbol),
-	)
-
-	program.Add(instr)
-	return instr.Result
-	//}
 	panic("unexpected node type :" + node.Type().String())
 }
 
