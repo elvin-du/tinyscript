@@ -9,7 +9,7 @@ import (
 type OpCodeProgram struct {
 	Entry        *int
 	Instructions []*Instruction
-	Comments     map[int]string
+	Comments     map[int]string //注释；行号：注释内容
 }
 
 func NewOpCodeProgram() *OpCodeProgram {
@@ -39,8 +39,9 @@ func (o *OpCodeProgram) SetEntry(entry *int) {
 	o.Entry = entry
 }
 
+//当前指令的位置添加一行注释
 func (o *OpCodeProgram) AddComment(comment string) {
-	o.Comments[len(o.Comments)] = comment
+	o.Comments[len(o.Instructions)] = comment
 }
 
 func (o *OpCodeProgram) ToByteCode() []int {
@@ -52,6 +53,7 @@ func (o *OpCodeProgram) ToByteCode() []int {
 	return codes
 }
 
+//从三地址代码中获取静态符号表中的值，存起来在虚拟机实例化时写入内存静态区
 func (o *OpCodeProgram) GetStaticArea(taProgram *translator.TAProgram) []int {
 	l := []int{}
 	for _, symbol := range taProgram.StaticTable.Symbols {

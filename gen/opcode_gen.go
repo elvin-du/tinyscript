@@ -27,7 +27,7 @@ func (g *OpCodeGen) Gen(taProgram *translator.TAProgram) *OpCodeProgram {
 		case translator.TAINSTR_TYPE_GOTO:
 			g.GenGoTo(program, taInstr)
 		case translator.TAINSTR_TYPE_CALL:
-			g.GenCopy(program, taInstr)
+			g.GenCall(program, taInstr)
 		case translator.TAINSTR_TYPE_PARAM:
 			g.GenPass(program, taInstr)
 		case translator.TAINSTR_TYPE_SP:
@@ -36,7 +36,8 @@ func (g *OpCodeGen) Gen(taProgram *translator.TAProgram) *OpCodeProgram {
 			if taInstr.Arg2 != nil && taInstr.Arg2.(string) == "main" {
 				size := len(program.Instructions)
 				program.SetEntry(&size)
-				labelHash[taInstr.Arg2.(string)] = len(program.Instructions)
+				//这里用于给计算label在代码中的行号做基础
+				labelHash[taInstr.Arg1.(string)] = len(program.Instructions)
 			}
 		case translator.TAINSTR_TYPE_RETURN:
 			g.GenReturn(program, taInstr)
@@ -66,6 +67,7 @@ func (g *OpCodeGen) GenIf(program *OpCodeProgram, ta *translator.TAInstruction) 
 	label := ta.Arg2
 	program.Add(NewBNEInstruction(operand.S2, operand.ZERO, label.(string)))
 }
+
 func (g *OpCodeGen) Relabel(program *OpCodeProgram, labelMap map[string]int) {
 	for _, instr := range program.Instructions {
 		if instr.Code == JUMP || instr.Code == JR || instr.Code == BNE {
@@ -82,8 +84,8 @@ func (g *OpCodeGen) Relabel(program *OpCodeProgram, labelMap map[string]int) {
 }
 
 func (g *OpCodeGen) GenReturn(program *OpCodeProgram, ta *translator.TAInstruction) {
-	if nil != ta.Arg1 {
-		ret := ta.Arg1.(*symbol.Symbol)
+	ret := ta.Arg1.(*symbol.Symbol)
+	if nil != ret {
 		program.Add(LoadToRegister(operand.S0, ret))
 	}
 	program.Add(NewOffsetInstruction(SW, operand.S0, operand.SP, operand.NewOffset(1)))
@@ -102,10 +104,10 @@ func (g *OpCodeGen) GenSP(program *OpCodeProgram, ta *translator.TAInstruction) 
 
 func (g *OpCodeGen) GenPass(program *OpCodeProgram, ta *translator.TAInstruction) {
 	arg1 := ta.Arg1.(*symbol.Symbol)
-	no := ta.Arg2.(int)
+	number := ta.Arg2.(int)
 	program.Add(LoadToRegister(operand.S0, arg1))
 	//pass a
-	program.Add(NewOffsetInstruction(SW, operand.S0, operand.SP, operand.NewOffset(-no)))
+	program.Add(NewOffsetInstruction(SW, operand.S0, operand.SP, operand.NewOffset(-number)))
 }
 
 func (g *OpCodeGen) GenFuncBegin(program *OpCodeProgram, ta *translator.TAInstruction) {
@@ -115,7 +117,7 @@ func (g *OpCodeGen) GenFuncBegin(program *OpCodeProgram, ta *translator.TAInstru
 
 func (g *OpCodeGen) GenCall(program *OpCodeProgram, ta *translator.TAInstruction) {
 	label := ta.Arg1.(*symbol.Symbol)
-	i := NewInstruction(JR)
+	i := NewInstruction(JR) //跳转之前会把PC寄存器的值存储到RA寄存器
 	i.OpList = append(i.OpList, operand.NewLabel(label.Label))
 	program.Add(i)
 }

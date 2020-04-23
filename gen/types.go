@@ -1,5 +1,6 @@
 package gen
 
+//寻址类型
 type AddressingType int
 
 const (

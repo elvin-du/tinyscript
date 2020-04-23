@@ -127,17 +127,17 @@ func (t *Translator) TranslateBlock(program *TAProgram, node ast.ASTNode, parent
 	parentOffset := table.CreateVariable()
 	parentOffset.Lexeme = lexer.NewToken(lexer.INTEGER, fmt.Sprintf("%d", parent.LocalSize()))
 
-	pushRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
-	program.Add(pushRecord)
+	//pushRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
+	//program.Add(pushRecord)
 	for _, stmt := range node.Children() {
 		t.TranslateStmt(program, stmt, table)
 	}
 
-	popRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
-	program.Add(popRecord)
-
-	pushRecord.Arg1 = -parent.LocalSize()
-	popRecord.Arg1 = parent.LocalSize()
+	//popRecord := NewTAInstruction(TAINSTR_TYPE_SP, nil, "", nil, nil)
+	//program.Add(popRecord)
+	//
+	//pushRecord.Arg1 = -parent.LocalSize()
+	//popRecord.Arg1 = parent.LocalSize()
 }
 
 func (t *Translator) TranslateIfStmt(program *TAProgram, node *ast.IfStmt, table *symbol.Table) {
@@ -198,16 +198,25 @@ func (t *Translator) TranslateCallExpr(program *TAProgram, node ast.ASTNode, tab
 	factor := node.GetChild(0)
 
 	//foo -> symbol(foo) L0
-	returnValue := table.CreateVariable() //返回值
-	table.CreateVariable() //返回地址
+	//table.CreateVariable()                //返回地址
 
+	var l = make([]*TAInstruction, 0)
 	for i := 1; i < len(node.Children()); i++ {
 		expr := node.GetChild(uint(i))
 		addr := t.TranslateExpr(program, expr, table)
-		program.Add(NewTAInstruction(TAINSTR_TYPE_PARAM, nil, "", addr, i-1))
+		l = append(l, NewTAInstruction(TAINSTR_TYPE_PARAM, nil, "", addr, i-1))
 	}
 
+	for _, instr := range l {
+		instr.Arg2 = table.LocalSize() + instr.Arg2.(int) + 2
+		program.Add(instr)
+	}
+
+	returnValue := table.CreateVariable() //返回值
 	funcAddr := table.CloneFromSymbolTree(factor.Lexeme(), 0)
+	if nil == funcAddr {
+		panic("function " + factor.Lexeme().Value + " not found")
+	}
 	program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", -table.LocalSize(), nil))
 	program.Add(NewTAInstruction(TAINSTR_TYPE_CALL, nil, "", funcAddr, nil))
 	program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", table.LocalSize(), nil))

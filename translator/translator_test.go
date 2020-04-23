@@ -123,17 +123,15 @@ func TestRecursionFunc(t *testing.T) {
 FUNC_BEGIN
 p1 = n == 0
 IF p1 ELSE L1
-SP -3
 RETURN 1
-SP 3
 L1:
-p4 = n - 1
-PARAM p4 0
-SP -6
+p2 = n - 1
+PARAM p2 6
+SP -5
 CALL L0
-SP 6
-p5 = p2 * n
-RETURN p5`
+SP 5
+p4 = p3 * n
+RETURN p4`
 	assert.Equal(t, program.String(), expected)
 
 }

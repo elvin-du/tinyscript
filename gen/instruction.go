@@ -124,7 +124,7 @@ func LoadToRegister(target *operand.Register, arg *symbol.Symbol) *Instruction {
 		return NewOffsetInstruction(LW, target, operand.STATIC, operand.NewOffset(arg.Offset))
 	}
 
-	panic(fmt.Sprintf("Cannot load type %d symbol to register", arg.Typ))
+	panic(fmt.Sprintf("Cannot load type %v symbol to register", arg.Typ))
 }
 
 func SaveToMemory(source *operand.Register, arg *symbol.Symbol) *Instruction {
