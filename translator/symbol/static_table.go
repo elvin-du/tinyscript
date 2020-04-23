@@ -19,8 +19,8 @@ func (s *StaticSymbolTable) Add(symbol *Symbol) {
 	lexval := symbol.Lexeme.Value
 	if _, ok := s.OffsetMap[lexval]; !ok {
 		s.OffsetMap[lexval] = symbol
-		s.OffsetCounter += 1
 		symbol.Offset = s.OffsetCounter
+		s.OffsetCounter += 1
 		s.Symbols = append(s.Symbols, symbol)
 	} else {
 		sameSymbol := s.OffsetMap[lexval]
@@ -40,4 +40,3 @@ func (s *StaticSymbolTable) String() string {
 
 	return strings.Join(list, "\n")
 }
-

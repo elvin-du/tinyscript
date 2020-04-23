@@ -14,6 +14,9 @@ func NewTranslator() *Translator {
 	return &Translator{}
 }
 
+/*
+符号表是辅助工具。对ast遍历的同时产生符号表，根据符号表的内容产生TAProgram。
+*/
 func (t *Translator) Translate(node ast.ASTNode) *TAProgram {
 	program := NewTAProgram()
 
@@ -22,6 +25,14 @@ func (t *Translator) Translate(node ast.ASTNode) *TAProgram {
 		t.TranslateStmt(program, child, table)
 	}
 	program.SetStaticSymbols(table)
+
+	mainFn := lexer.NewToken(lexer.VARIABLE, "main")
+	if table.Exists(mainFn) {
+		table.CreateVariable() //返回值
+		program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", -table.LocalSize(), nil))
+		program.Add(NewTAInstruction(TAINSTR_TYPE_CALL, nil, "", table.CloneFromSymbolTree(mainFn, 0), nil))
+		program.Add(NewTAInstruction(TAINSTR_TYPE_SP, nil, "", table.LocalSize(), nil))
+	}
 
 	return program
 }
@@ -187,8 +198,8 @@ func (t *Translator) TranslateCallExpr(program *TAProgram, node ast.ASTNode, tab
 	factor := node.GetChild(0)
 
 	//foo -> symbol(foo) L0
-	returnValue := table.CreateVariable()
-	table.CreateVariable()
+	returnValue := table.CreateVariable() //返回值
+	table.CreateVariable() //返回地址
 
 	for i := 1; i < len(node.Children()); i++ {
 		expr := node.GetChild(uint(i))

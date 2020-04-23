@@ -38,6 +38,7 @@ func (t *TAProgram) String() string {
 	return strings.Join(lines, "\n")
 }
 
+//根据符号表的内容，判断符号类型，如果是SYMBOL_IMMEDIATE，则加入静态符号表，以此来设置静态符号表的信息
 func (t *TAProgram) SetStaticSymbols(table *symbol.Table) {
 	for _, v := range table.Symbols {
 		if symbol.SYMBOL_IMMEDIATE == v.Typ {

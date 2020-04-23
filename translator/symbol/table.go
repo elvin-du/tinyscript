@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"tinyscript/lexer"
 )
-
+/*
+一个符号表在运行时就是活动记录，一个符号表可以对应多个活动记录（递归），符号表这个时候就是一个模板
+ */
 type Table struct {
 	Parent      *Table
 	Children    []*Table
