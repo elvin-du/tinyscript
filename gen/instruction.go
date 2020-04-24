@@ -2,6 +2,7 @@ package gen
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"tinyscript/gen/operand"
 	"tinyscript/translator/symbol"
@@ -106,7 +107,12 @@ func (i *Instruction) ToByteCode() int {
 	case ADDRESSING_TYPE_OFFSET:
 		r1 := i.OpList[0].(*operand.Register)
 		r2 := i.OpList[1].(*operand.Register)
-		offset := i.OpList[2].(*operand.Offset)
+		var offset *operand.Offset = nil
+		if reflect.TypeOf(i.OpList[2]).String() == reflect.TypeOf(&operand.Label{}).String() {
+			offset = i.OpList[2].(*operand.Label).Offset
+		} else {
+			offset = i.OpList[2].(*operand.Offset)
+		}
 
 		code |= int(r1.Addr) << 21
 		code |= int(r2.Addr) << 16

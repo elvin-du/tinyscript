@@ -82,7 +82,11 @@ func AssertSameInstruction(t *testing.T, a, b *Instruction) {
 	assert.Equal(t, len(a.OpList), len(b.OpList))
 	for i, av := range a.OpList {
 		bv := b.GetOperand(i)
-		assert.Equal(t, bv, av)
+		if reflect.ValueOf(av).Type().String() == reflect.TypeOf(&operand.Label{}).String() {
+			assert.Equal(t, bv, av.(*operand.Label).Offset)
+		}else {
+			assert.Equal(t, bv, av)
+		}
 
 		if reflect.ValueOf(av).Type().String() == reflect.TypeOf(&operand.ImmediateNumber{}).String() {
 			assert.Equal(t, av.(*operand.ImmediateNumber).Value, bv.(*operand.ImmediateNumber).Value)
@@ -92,7 +96,7 @@ func AssertSameInstruction(t *testing.T, a, b *Instruction) {
 			assert.Equal(t, av.(*operand.Register).Addr, bv.(*operand.Register).Addr)
 			assert.Equal(t, av.(*operand.Register).Name, bv.(*operand.Register).Name)
 		} else if reflect.ValueOf(av).Type().String() == reflect.TypeOf(&operand.Label{}).String() {
-			assert.Equal(t, av.(*operand.Label).Offset, bv.(*operand.Label).Offset)
+			assert.Equal(t, av.(*operand.Label).Offset.Offset, bv.(*operand.Offset).Offset)
 		} else {
 			panic("unsupported encode/decode type" + av.String())
 		}

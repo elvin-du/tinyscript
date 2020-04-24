@@ -111,15 +111,13 @@ func (vm *VM) Exec(instr *gen.Instruction) {
 	}
 }
 
-func (vm *VM) run(offset int) {
+func (vm *VM) run() {
 	//模拟CPU循环
 	// fetch
 	// decode
 	// exec
 	// pc++
-	for {
-		vm.runOneStep()
-	}
+	for ;vm.runOneStep();{}
 }
 
 func (vm *VM) GetSpMemory(offset int) int {

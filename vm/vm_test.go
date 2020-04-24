@@ -64,16 +64,34 @@ return
 }
 
 func TestRecursiveFunction(t *testing.T) {
-	taProg := translator.NewTranslator().Translate(parser.Parse("../tests/fact2.ts"))
+	taProg := translator.NewTranslator().Translate(parser.ParseFromFile("../tests/fact5.ts"))
 	prog := gen.NewOpCodeGen().Gen(taProg)
 	staticTable := prog.GetStaticArea(taProg)
 	opcodes := prog.ToByteCode()
+	t.Log(prog)
 	t.Log(taProg.StaticTable)
 	vm := NewVM(staticTable, opcodes, prog.Entry)
 	// CALL main
-	vm.runOneStep();
-	vm.runOneStep();
-	vm.runOneStep();
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
 	t.Log("RA:", vm.Registers[operand.RA.Addr])
-	assert.Equal(t, vm.GetSpMemory(0), 18)
+	assert.Equal(t, vm.GetSpMemory(0), 39)
+
+	// PARAM 10 0
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, 2, vm.GetSpMemory(-3))
+}
+
+func TestRecursivefunction1(t *testing.T) {
+	taProg := translator.NewTranslator().Translate(parser.ParseFromFile("../tests/fact5.ts"))
+	prog := gen.NewOpCodeGen().Gen(taProg)
+	staticTable := prog.GetStaticArea(taProg)
+	opcodes := prog.ToByteCode()
+	//t.Log(prog)
+	//t.Log(taProg.StaticTable)
+	vm := NewVM(staticTable, opcodes, prog.Entry)
+	vm.run()
+	assert.Equal(t, 120, vm.GetSpMemory(0))
 }
