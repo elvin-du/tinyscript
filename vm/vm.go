@@ -131,5 +131,6 @@ func (vm *VM) runOneStep() bool {
 	instr := vm.Decode(code)
 	vm.Exec(instr)
 	vm.Registers[operand.PC.Addr] += 1
+	log.Println(vm.Registers[operand.PC.Addr], "|", vm.EndProgramSection)
 	return vm.Registers[operand.PC.Addr] < vm.EndProgramSection
 }

@@ -102,14 +102,21 @@ func TestRecursiveFunction(t *testing.T) {
 	assert.Equal(t, vm.GetSpMemory(-2) == 0, false)
 
 	// #IF p1 ELSE L1
-	vm.runOneStep();
-	vm.runOneStep();
+	vm.runOneStep()
+	vm.runOneStep()
 
 	// #p3 = n - 1
-	vm.runOneStep();
-	vm.runOneStep();
-	vm.runOneStep();
-	assert.Equal(t,1, vm.GetSpMemory(-3));
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, 1, vm.GetSpMemory(-3))
+
+	//// #PARAM p3 0
+	//// #SP-5
+	//vm.runOneStep()
+	//vm.runOneStep()
+	//vm.runOneStep()
+	//assert.Equal(t,1, vm.GetSpMemory(-1))
 
 }
 
