@@ -1,5 +1,7 @@
 package gen
 
+import "fmt"
+
 var Codes = [63]*OpCode{}
 
 var (
@@ -14,13 +16,13 @@ var (
 	MFLO = NewOpCode(ADDRESSING_TYPE_REGISTER, "MFLO", 0x08) //MULT/MULTI操作码的结果会存储到这个寄存器中
 
 	EQ  = NewOpCode(ADDRESSING_TYPE_REGISTER, "EQ", 0x09)
-	BNE = NewOpCode(ADDRESSING_TYPE_OFFSET, "BNE", 0x15)//不相等
+	BNE = NewOpCode(ADDRESSING_TYPE_OFFSET, "BNE", 0x15) //不相等
 
 	SW = NewOpCode(ADDRESSING_TYPE_OFFSET, "SW", 0x10) //从寄存器写回内存
-	LW = NewOpCode(ADDRESSING_TYPE_OFFSET, "LW", 0x11)//从内存读入到寄存器
+	LW = NewOpCode(ADDRESSING_TYPE_OFFSET, "LW", 0x11) //从内存读入到寄存器
 
 	JUMP   = NewOpCode(ADDRESSING_TYPE_JUMP, "JUMP", 0x20)
-	JR     = NewOpCode(ADDRESSING_TYPE_JUMP, "JR", 0x21)//函数的跳转
+	JR     = NewOpCode(ADDRESSING_TYPE_JUMP, "JR", 0x21) //函数的跳转
 	RETURN = NewOpCode(ADDRESSING_TYPE_JUMP, "RETURN", 0x22)
 )
 
@@ -41,5 +43,10 @@ func (oc *OpCode) String() string {
 }
 
 func FromByte(byteOpcode byte) *OpCode {
-	return Codes[byteOpcode]
+	code := Codes[byteOpcode]
+	if nil == code {
+		panic(fmt.Sprintf("%x opcode undefined", byteOpcode))
+	}
+
+	return code
 }

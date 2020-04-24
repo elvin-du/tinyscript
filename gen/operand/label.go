@@ -18,3 +18,6 @@ func (l *Label) String() string {
 func (*Label) Typ() OperandType {
 	return TYPE_LABEL
 }
+func (l *Label) SetOffset(offset int) {
+	l.Offset = NewOffset(offset)
+}

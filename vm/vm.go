@@ -31,7 +31,7 @@ func NewVM(staticArea []int, opcodes []int, entry *int) *VM {
 	vm.Registers[operand.PC.Addr] = i - 3
 	vm.EndProgramSection = i
 
-	vm.Registers[operand.PC.Addr] = 4095
+	vm.Registers[operand.SP.Addr] = 4095
 	return vm
 }
 func (vm *VM) Fetch() int {
@@ -62,8 +62,7 @@ func (vm *VM) Exec(instr *gen.Instruction) {
 	case 0x03: //MULT
 		r0 := instr.GetOperand(0).(*operand.Register)
 		r1 := instr.GetOperand(1).(*operand.Register)
-		r2 := instr.GetOperand(2).(*operand.Register)
-		vm.Registers[r0.Addr] = vm.Registers[r1.Addr] * vm.Registers[r2.Addr]
+		vm.Registers[operand.L0.Addr] = vm.Registers[r0.Addr] * vm.Registers[r1.Addr]
 	case 0x05: //ADDI
 		r0 := instr.GetOperand(0).(*operand.Register)
 		r1 := instr.GetOperand(1).(*operand.ImmediateNumber)

@@ -35,7 +35,10 @@ func (t TAInstruction) String() string {
 	case TAINSTR_TYPE_FUNC_BEGIN:
 		return "FUNC_BEGIN"
 	case TAINSTR_TYPE_RETURN:
-		return fmt.Sprintf("RETURN %v", t.Arg1)
+		if !IsNil(t.Arg1) {
+			return fmt.Sprintf("RETURN %v", t.Arg1)
+		}
+		return fmt.Sprintf("RETURN")
 	case TAINSTR_TYPE_PARAM:
 		return fmt.Sprintf("PARAM %v %v", t.Arg1, t.Arg2)
 	case TAINSTR_TYPE_SP:

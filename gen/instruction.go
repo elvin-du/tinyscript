@@ -101,7 +101,7 @@ func (i *Instruction) ToByteCode() int {
 		}
 	case ADDRESSING_TYPE_JUMP:
 		if len(i.OpList) > 0 {
-			code |= i.OpList[0].(*operand.Offset).GetEncodedOffset()
+			code |= i.OpList[0].(*operand.Label).Offset.GetEncodedOffset()
 		}
 	case ADDRESSING_TYPE_OFFSET:
 		r1 := i.OpList[0].(*operand.Register)
@@ -132,7 +132,7 @@ func SaveToMemory(source *operand.Register, arg *symbol.Symbol) *Instruction {
 }
 
 func FromByCode(code int) *Instruction {
-	byteOpcode := (byte)(code&MASK_OPCODE) >> 26
+	byteOpcode := (byte)(int(code&MASK_OPCODE) >> 26)
 	opcode := FromByte(byteOpcode)
 	i := NewInstruction(opcode)
 
