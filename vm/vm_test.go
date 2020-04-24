@@ -64,7 +64,8 @@ return
 }
 
 func TestRecursiveFunction(t *testing.T) {
-	taProg := translator.NewTranslator().Translate(parser.ParseFromFile("../tests/fact5.ts"))
+	taProg := translator.NewTranslator().Translate(parser.ParseFromFile("../tests/fact2.ts"))
+	t.Log(taProg)
 	prog := gen.NewOpCodeGen().Gen(taProg)
 	staticTable := prog.GetStaticArea(taProg)
 	opcodes := prog.ToByteCode()
@@ -81,7 +82,35 @@ func TestRecursiveFunction(t *testing.T) {
 	// PARAM 10 0
 	vm.runOneStep()
 	vm.runOneStep()
-	assert.Equal(t, 2, vm.GetSpMemory(-3))
+	assert.Equal(t, vm.GetSpMemory(-3), 2)
+
+	// SP -2
+	vm.runOneStep()
+	vm.runOneStep()
+	t.Log("RA:", vm.Registers[operand.RA.Addr])
+
+	// #FUNC_BEGIN
+	vm.runOneStep()
+	assert.Equal(t, vm.GetSpMemory(0), 33)
+
+	// #p1 = n == 0
+	assert.Equal(t, vm.GetSpMemory(-1), 2)
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, vm.GetSpMemory(-2) == 0, false)
+
+	// #IF p1 ELSE L1
+	vm.runOneStep();
+	vm.runOneStep();
+
+	// #p3 = n - 1
+	vm.runOneStep();
+	vm.runOneStep();
+	vm.runOneStep();
+	assert.Equal(t,1, vm.GetSpMemory(-3));
+
 }
 
 func TestRecursivefunction1(t *testing.T) {

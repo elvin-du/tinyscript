@@ -53,8 +53,8 @@ func (vm *VM) Exec(instr *gen.Instruction) {
 		r1 := instr.GetOperand(1).(*operand.Register)
 		r2 := instr.GetOperand(2).(*operand.Register)
 		vm.Registers[r0.Addr] = vm.Registers[r1.Addr] + vm.Registers[r2.Addr]
-	case 0x09: //
-	case 0x02: //SUB
+	//case 0x09: //
+	case 0x09, 0x02: //SUB
 		r0 := instr.GetOperand(0).(*operand.Register)
 		r1 := instr.GetOperand(1).(*operand.Register)
 		r2 := instr.GetOperand(2).(*operand.Register)
@@ -117,7 +117,8 @@ func (vm *VM) run() {
 	// decode
 	// exec
 	// pc++
-	for ;vm.runOneStep();{}
+	for ; vm.runOneStep(); {
+	}
 }
 
 func (vm *VM) GetSpMemory(offset int) int {
