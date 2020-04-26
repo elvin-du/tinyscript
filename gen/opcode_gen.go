@@ -36,9 +36,9 @@ func (g *OpCodeGen) Gen(taProgram *translator.TAProgram) *OpCodeProgram {
 			if taInstr.Arg2 != nil && taInstr.Arg2.(string) == "main" {
 				size := len(program.Instructions)
 				program.SetEntry(&size)
-				//这里用于给计算label在代码中的行号做基础
-				labelHash[taInstr.Arg1.(string)] = len(program.Instructions)
 			}
+			//这里用于给计算label在代码中的行号做基础
+			labelHash[taInstr.Arg1.(string)] = len(program.Instructions)
 		case translator.TAINSTR_TYPE_RETURN:
 			g.GenReturn(program, taInstr)
 		case translator.TAINSTR_TYPE_FUNC_BEGIN:

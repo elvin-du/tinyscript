@@ -111,13 +111,95 @@ func TestRecursiveFunction(t *testing.T) {
 	vm.runOneStep()
 	assert.Equal(t, 1, vm.GetSpMemory(-3))
 
-	//// #PARAM p3 0
-	//// #SP-5
-	//vm.runOneStep()
-	//vm.runOneStep()
-	//vm.runOneStep()
-	//assert.Equal(t,1, vm.GetSpMemory(-1))
+	// #PARAM p3 0
+	// #SP-5
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, 1, vm.GetSpMemory(-1))
 
+	vm.runOneStep()
+	vm.runOneStep()
+
+	// #p1 = n == 0
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, false, vm.GetSpMemory(-2) == 0)
+
+	// #IF p1 ELSE L1
+	vm.runOneStep()
+
+	// #p3 = n - 1
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+
+	// #PARAM p3 0
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+
+	// CALL
+	vm.runOneStep()
+	vm.runOneStep()
+
+	// #p1 = n == 0
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	assert.Equal(t, true, vm.GetSpMemory(-2) == 0)
+
+	// #IF p1 ELSE L1
+	vm.runOneStep()
+
+	// RETURN 1
+	vm.runOneStep()
+	vm.runOneStep()
+
+	vm.runOneStep()
+	vm.runOneStep()
+
+	// #p4 = p2 * n 计算递归值
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	// #RETURN p4
+	vm.runOneStep()
+	vm.runOneStep()
+	//RETURN
+	vm.runOneStep()
+	vm.runOneStep()
+
+	//#p4 = p2 * n
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+	vm.runOneStep()
+
+	assert.Equal(t, 2, vm.GetSpMemory(-5))
+
+	vm.runOneStep()
+	vm.runOneStep()
+	// RETURN MAIN
+	vm.runOneStep()
+
+	// SP 2
+	vm.runOneStep()
+
+	// #RETURN p1 : from main
+	vm.runOneStep()
+	assert.Equal(t, 2, vm.GetSpMemory(-1))
+
+	for ; vm.runOneStep(); {
+	}
+	assert.Equal(t, 2, vm.GetSpMemory(0))
 }
 
 func TestRecursivefunction1(t *testing.T) {
