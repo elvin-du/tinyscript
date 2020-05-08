@@ -27,4 +27,4 @@ func main() void {
 }
 ```
 
-每个函数都实现了相应的UnitTest，单元测试真像～
+每个函数都实现了相应的UnitTest，单元测试真香～
