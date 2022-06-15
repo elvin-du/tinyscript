@@ -25,6 +25,7 @@ var NodeTypeStringMap = map[NodeType]string{
 	ASTNODE_TYPE_BLOCK:                 "block",
 	ASTNODE_TYPE_ASSIGN_STMT:           "assign_stmt",
 	ASTNODE_TYPE_BINARY_EXPR:           "binary_expr",
+	ASTNODE_TYPE_UNARY_EXPR:            "unary_expr",
 	ASTNODE_TYPE_CALL_EXPR:             "call_expr",
 	ASTNODE_TYPE_DECLARE_STMT:          "declare_stmt",
 	ASTNODE_TYPE_FOR_STMT:              "for_stmt",
@@ -34,7 +35,6 @@ var NodeTypeStringMap = map[NodeType]string{
 	ASTNODE_TYPE_SCALAR:                "scalar",
 	ASTNODE_TYPE_VARIABLE:              "variable",
 	ASTNODE_TYPE_WHILE_STMT:            "while_stmt",
-	ASTNODE_TYPE_UNARY_EXPR:            "unary_expr",
 }
 
 func (nt NodeType) String() string {

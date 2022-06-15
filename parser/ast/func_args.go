@@ -14,10 +14,10 @@ func MakeFuncArgs() *FuncArgs {
 
 func FuncArgsParse(stream *PeekTokenStream) ASTNode {
 	args := MakeFuncArgs()
-	for ; stream.Peek().IsType(); {
+	for stream.Peek().IsType() {
 		typ := stream.Next()
 		v := FactorParse(stream)
-		v.SetTypeLexeme(typ)
+		v.SetTypeLexeme(typ) //为语义分析做准备，设置参数变量的类型
 		args.AddChild(v)
 		if stream.Peek().Value != ")" {
 			stream.NextMatch(",")

@@ -8,14 +8,14 @@ import (
 
 type ASTNode interface {
 	//get
-	Lexeme() *lexer.Token
+	Lexeme() *lexer.Token //ast节点对应的token是什么
 	Type() NodeType
-	Label() string
+	Label() string //用字符串标识ast节点的含义，主要用于打印日志
 	Children() []ASTNode
 	GetChild(uint) ASTNode
 	Parent() ASTNode
 	Print(indent int)
-	TypeLexeme() *lexer.Token
+	TypeLexeme() *lexer.Token //标识变量的类型和函数的返回值类型；别的ast节点没有必要设置这个属性
 	IsValueType() bool
 	Prop(string) interface{}
 
@@ -32,10 +32,10 @@ type ASTNode interface {
 type node struct {
 	parent     ASTNode
 	children   []ASTNode
-	label      string //
+	label      string //备注（标签）
 	typ        NodeType
-	lexeme     *lexer.Token
-	typeLexeme *lexer.Token //func foo(int a); 这时typelexeme等于int型的token
+	lexeme     *lexer.Token           //词法单元
+	typeLexeme *lexer.Token           //func foo(int a); 这时typelexeme等于int型的token
 	prop       map[string]interface{} //用于符号表，语法分析不会用到
 }
 

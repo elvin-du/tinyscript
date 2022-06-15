@@ -18,8 +18,8 @@ func FuncDeclareStmtParse(stream *PeekTokenStream) *FuncDeclareStmt {
 	//func add() int {}
 	fn := MakeFuncDeclareStmt()
 	lexeme := stream.Peek()
-	fnV := FactorParse(stream)
-	fn.SetLexeme(lexeme)
+	fnV := FactorParse(stream) //函数名ast节点
+	fn.SetLexeme(lexeme)       //函数名token作为这个ast节点的lexeme
 	fn.AddChild(fnV)
 
 	stream.NextMatch("(")
@@ -32,7 +32,7 @@ func FuncDeclareStmtParse(stream *PeekTokenStream) *FuncDeclareStmt {
 		panic("syntax error: unexpected " + keyword.Value)
 	}
 
-	fnV.SetTypeLexeme(keyword)
+	fnV.SetTypeLexeme(keyword) //函数名ast节点的类型，即：函数返回值类型，用token表示
 	block := BlockParse(stream)
 	fn.AddChild(block)
 

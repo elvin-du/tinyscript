@@ -48,6 +48,7 @@ func (pt *PeekTokenStream) PutBack(n int) {
 	pt.current -= n //必须+1，因为初始化时current就指向第一个元素
 }
 
+//下一个token的value匹配实参字符的话，返回这个token，否则panic
 func (pt *PeekTokenStream) NextMatch(value string) *lexer.Token {
 	token := pt.Next()
 	if token.Value != value {
@@ -56,6 +57,7 @@ func (pt *PeekTokenStream) NextMatch(value string) *lexer.Token {
 	return token
 }
 
+//下一个token匹配实参类型的话，返回下一个token
 func (pt *PeekTokenStream) NextMatchType(typ lexer.TokenType) *lexer.Token {
 	token := pt.Next()
 	if token.Typ != typ {
